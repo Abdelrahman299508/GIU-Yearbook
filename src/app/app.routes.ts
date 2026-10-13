@@ -13,10 +13,15 @@ export const routes: Routes = [
   // STEP 1: The landing page. An empty path '' means "the home URL".
   { path: '', component: StudentsPage, title: 'Class of 2028 · GIU Yearbook' },
 
-  // STEP 2: Pages we have NOT designed/built yet use one placeholder page.
-  // `data` lets us pass a small piece of information (the title) to it.
-  // TIP: When you build the real page, replace `PlaceholderPage` with it.
-  { path: 'teachers', component: PlaceholderPage, data: { title: 'Teachers & Staff' } },
+  // STEP 2: Teachers & Staff is lazy. loadComponent downloads the page
+  // only when someone opens /teachers. There is no import of StaffPage
+  // at the top of this file, which is what keeps it out of the first bundle.
+  {
+    path: 'teachers',
+    title: 'Teachers & Staff · GIU Yearbook',
+    loadComponent: () => import('./pages/staff-page/staff-page').then((m) => m.StaffPage),
+  },
+  // Pages we have NOT designed yet still use one placeholder page.
   { path: 'gallery', component: PlaceholderPage, data: { title: 'Gallery' } },
   { path: 'login', component: PlaceholderPage, data: { title: 'Student login' } },
 
