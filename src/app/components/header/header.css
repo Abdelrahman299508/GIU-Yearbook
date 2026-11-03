@@ -8,11 +8,22 @@
 }
 
 /* STEP 1: Tricolor = 3 equal bands in a row (flex: 1 shares the width). */
-.tricolor { display: flex; height: 4px; }
-.band { flex: 1; }
-.band--ink  { background: var(--color-ink); }
-.band--red  { background: var(--color-red); }
-.band--gold { background: var(--color-gold); }
+.tricolor {
+  display: flex;
+  height: 4px;
+}
+.band {
+  flex: 1;
+}
+.band--ink {
+  background: var(--color-ink);
+}
+.band--red {
+  background: var(--color-red);
+}
+.band--gold {
+  background: var(--color-gold);
+}
 
 /* STEP 2: Inner row. CSS Grid with 3 columns:
    [logo] [navigation, centered] [login button]
@@ -26,27 +37,75 @@
   padding: var(--space-6) var(--page-margin);
 }
 
-.brand { display: flex; align-items: center; gap: var(--space-4); }
-.brand__logo { width: 276px; height: auto; }
-.brand__fallback { font: 500 56px/1 var(--font-serif); color: var(--color-red); }
-.brand__text { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
-.brand__text strong { font-weight: 500; }
-.brand__text small { color: var(--color-muted); font-size: 10px; letter-spacing: 0.08em; }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+.brand__logo {
+  width: 276px;
+  height: auto;
+}
+.brand__fallback {
+  font: 500 56px/1 var(--font-serif);
+  color: var(--color-red);
+}
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 12px;
+}
+.brand__text strong {
+  font-weight: 500;
+}
+.brand__text small {
+  color: var(--color-muted);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
 
 /* STEP 3: Navigation links. The active one is red with a 2px underline. */
-.nav { display: flex; gap: var(--space-6); }
+.nav {
+  display: flex;
+  gap: var(--space-6);
+}
 .nav__link {
   padding: var(--space-3) var(--space-1);
-  margin-bottom: -25px;                 /* pull underline onto the header border */
+  margin-bottom: -25px; /* pull underline onto the header border */
   padding-bottom: 36px;
   border-bottom: 2px solid transparent;
   color: var(--color-muted);
   font-size: 13px;
 }
-.nav__link:hover { color: var(--color-ink); }
-.nav__link--active { color: var(--color-red); border-bottom-color: var(--color-red); }
+.nav__link:hover {
+  color: var(--color-ink);
+}
+.nav__link--active {
+  color: var(--color-red);
+  border-bottom-color: var(--color-red);
+}
 
-.header__login { justify-self: end; }
+.header__actions {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: var(--space-4);
+}
+.header__saved {
+  font-size: 13px;
+  color: var(--color-muted);
+}
+.header__count {
+  display: inline-block;
+  min-width: 24px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--color-gold-tint);
+  color: var(--color-ink);
+  font-weight: 600;
+  text-align: center;
+}
 
 /* STEP 4: MOBILE (Figma: 390px frames).
    Identity and login stay on row 1; navigation becomes row 2.
@@ -60,10 +119,25 @@
     padding-top: var(--space-4);
     padding-bottom: 0;
   }
-  .brand { grid-area: brand; }
-  .header__login { grid-area: login; }
-  .nav { grid-area: nav; justify-content: space-between; gap: var(--space-3); }
-  .nav__link { margin-bottom: 0; padding-bottom: var(--space-3); }
-  .brand__logo { width: 120px; }
-  .brand__text { display: none; }
+  .brand {
+    grid-area: brand;
+  }
+  .header__actions {
+    grid-area: login;
+  }
+  .nav {
+    grid-area: nav;
+    justify-content: space-between;
+    gap: var(--space-3);
+  }
+  .nav__link {
+    margin-bottom: 0;
+    padding-bottom: var(--space-3);
+  }
+  .brand__logo {
+    width: 120px;
+  }
+  .brand__text {
+    display: none;
+  }
 }

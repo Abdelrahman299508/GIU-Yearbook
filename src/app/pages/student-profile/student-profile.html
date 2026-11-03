@@ -1,0 +1,62 @@
+<!-- One student, read from the store by the :id in the URL. -->
+@if (student(); as person) {
+  <article class="profile">
+    <a class="btn" routerLink="/">
+      Back to the directory
+      <img src="icons/arrow-up.svg" alt="" aria-hidden="true" />
+    </a>
+
+    <div class="profile__layout">
+      <img
+        class="profile__photo"
+        [src]="photoSrc()"
+        [alt]="'Portrait of ' + person.name"
+        (error)="onImageError()"
+      />
+
+      <div>
+        <p class="overline">THE GIU YEARBOOK / CLASS OF {{ person.classYear }}</p>
+        <h1 class="profile__name">{{ person.name }}</h1>
+        <p class="profile__meta">{{ person.faculty }} · Class of {{ person.classYear }}</p>
+        <p class="profile__quote">“{{ person.quote }}”</p>
+
+        <button
+          type="button"
+          class="btn profile__save"
+          [class.profile__save--on]="isSaved()"
+          [attr.aria-pressed]="isSaved()"
+          (click)="onToggleSaved()"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"
+            />
+          </svg>
+          {{ isSaved() ? 'Saved to my yearbook' : 'Save to my yearbook' }}
+        </button>
+      </div>
+    </div>
+  </article>
+} @else if (errorMessage()) {
+  <section class="profile">
+    <p class="status status--error" role="alert">{{ errorMessage() }}</p>
+    <a class="btn" routerLink="/">Back to the directory</a>
+  </section>
+} @else if (loading() || !loaded()) {
+  <p class="status" role="status">Loading student…</p>
+} @else {
+  <section class="profile">
+    <p class="overline">THE GIU YEARBOOK</p>
+    <h1 class="profile__name">Student not found</h1>
+    <p class="profile__missing">This page does not match anyone in the class list.</p>
+    <a class="btn" routerLink="/">Back to the directory</a>
+  </section>
+}

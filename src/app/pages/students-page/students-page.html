@@ -48,11 +48,14 @@
 
   <label class="field field--select">
     <span class="visually-hidden">Filter by faculty</span>
-    <select [value]="selectedFaculty()" (change)="onFacultyChange($event)">
-      <option value="all">All faculties</option>
+    <!-- [selected] is on each option. Binding [value] on the <select>
+         runs before @for adds these options, so a saved faculty would
+         fall back to "All faculties" when you return from a profile. -->
+    <select (change)="onFacultyChange($event)">
+      <option value="all" [selected]="selectedFaculty() === 'all'">All faculties</option>
       <!-- @for builds one <option> per faculty found in the data -->
       @for (f of faculties(); track f) {
-        <option [value]="f">{{ f }}</option>
+        <option [value]="f" [selected]="selectedFaculty() === f">{{ f }}</option>
       }
     </select>
     <img src="icons/chevron-down.svg" alt="" aria-hidden="true" />
@@ -60,9 +63,9 @@
 
   <label class="field field--select">
     <span class="visually-hidden">Sort students</span>
-    <select [value]="sortBy()" (change)="onSortChange($event)">
-      <option value="featured">Featured first</option>
-      <option value="name">Name A–Z</option>
+    <select (change)="onSortChange($event)">
+      <option value="featured" [selected]="sortBy() === 'featured'">Featured first</option>
+      <option value="name" [selected]="sortBy() === 'name'">Name A–Z</option>
     </select>
     <img src="icons/chevron-down.svg" alt="" aria-hidden="true" />
   </label>

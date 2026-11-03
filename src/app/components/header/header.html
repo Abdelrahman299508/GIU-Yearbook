@@ -15,8 +15,12 @@
         <!-- (error) runs if the file is missing.
              TIP: export the logo from Figma and save it as
              public/images/giu-logo.png -->
-        <img class="brand__logo" src="images/giu-logo.png"
-             alt="German International University" (error)="logoFailed.set(true)">
+        <img
+          class="brand__logo"
+          src="images/giu-logo.png"
+          alt="German International University"
+          (error)="logoFailed.set(true)"
+        />
       } @else {
         <span class="brand__fallback">GIU</span>
       }
@@ -31,18 +35,27 @@
          COMMON MISTAKE: forgetting `track` is a compile error. -->
     <nav class="nav" aria-label="Main">
       @for (link of navLinks; track link.path) {
-        <a class="nav__link" [routerLink]="link.path"
-           routerLinkActive="nav__link--active"
-           [routerLinkActiveOptions]="{ exact: link.exact }">
+        <a
+          class="nav__link"
+          [routerLink]="link.path"
+          routerLinkActive="nav__link--active"
+          [routerLinkActiveOptions]="{ exact: link.exact }"
+        >
           {{ link.label }}
         </a>
       }
     </nav>
 
-    <!-- STEP 4: The login button uses the shared .btn styles from styles.css. -->
-    <a class="btn header__login" routerLink="/login">
-      Student login
-      <img src="icons/arrow-up-right.svg" alt="" aria-hidden="true" />
-    </a>
+    <!-- STEP 4: Saved count and login stay together in the third grid column.
+         aria-live makes a screen reader announce the new count. -->
+    <div class="header__actions">
+      <p class="header__saved" aria-live="polite">
+        Saved <span class="header__count">{{ saved.count() }}</span>
+      </p>
+      <a class="btn header__login" routerLink="/login">
+        Student login
+        <img src="icons/arrow-up-right.svg" alt="" aria-hidden="true" />
+      </a>
+    </div>
   </div>
 </header>

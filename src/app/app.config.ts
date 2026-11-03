@@ -7,6 +7,11 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { provideHttpClient } from '@angular/common/http';
+import { provideEffects } from '@ngrx/effects';
+import { provideStore } from '@ngrx/store';
+
+import { StudentsEffects } from './state/students/students.effects';
+import { studentsFeatureKey, studentsReducer } from './state/students/students.reducer';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -17,6 +22,11 @@ export const appConfig: ApplicationConfig = {
     // the fake API now and talk to Laravel later.
     // COMMON MISTAKE: skipping this line gives "No provider for HttpClient".
     provideHttpClient(),
+
+    // STEP 3: The students store. It outlives every page, so the list,
+    // the loading flag and the filters are still there after a profile.
+    provideStore({ [studentsFeatureKey]: studentsReducer }),
+    provideEffects(StudentsEffects),
 
     provideClientHydration(),
   ],

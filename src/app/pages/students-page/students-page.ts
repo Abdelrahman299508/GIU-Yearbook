@@ -4,18 +4,36 @@
    FIGMA: Frame "Class of 2028 · Student directory".
 
    WHAT STUDENTS PRACTISE HERE
-   1. Fetching data from a service (the fake API)
-   2. Loading / error / empty states
-   3. Filtering + sorting with signals and `computed`
+   1. Reading a list, its loading state and its filters from an NgRx store
+   2. Dispatching actions instead of editing the data in the page
+   3. selectSignal: the template still calls signals, the store owns them
+
+   The page used to keep this state in its own signals. Opening a profile
+   destroyed the page, so the search was forgotten. The store is created
+   once for the app, so the list and the filters are still here on return.
    ===================================================================== */
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
+import { Store } from '@ngrx/store';
 
 import { StudentCard } from '../../components/student-card/student-card';
-import { Student } from '../../models/student.model';
-import { StudentService } from '../../services/student.service';
-
-// A type for the sort dropdown. Only these two values are allowed.
-type SortMode = 'featured' | 'name';
+import {
+  SortMode,
+  loadStudents,
+  setFaculty,
+  setSearchText,
+  setSort,
+} from '../../state/students/students.actions';
+import {
+  selectAllStudents,
+  selectErrorMessage,
+  selectFaculties,
+  selectLoading,
+  selectSearchText,
+  selectSelectedFaculty,
+  selectSortBy,
+  selectTotalLabel,
+  selectVisibleStudents,
+} from '../../state/students/students.selectors';
 
 @Component({
   selector: 'app-student-page',
@@ -25,80 +43,39 @@ type SortMode = 'featured' | 'name';
   styleUrl: './students-page.css',
 })
 export class StudentsPage implements OnInit {
-  // Ask Angular for the service. This component never touches
-  // JSON files or URLs. That is the service's job.
-  private readonly studentService = inject(StudentService);
+  // The page talks to the store. StudentService is used by the effect,
+  // not by this component.
+  private readonly store = inject(Store);
 
-  // STATE = data that can change while the page is open.
-  // Each piece lives in a signal. When a signal changes, every place in
-  // the template that reads it updates automatically.
-  protected readonly students = signal<Student[]>([]); // all students from the "API"
-  protected readonly loading = signal(true); // true until data arrives
-  protected readonly errorMessage = signal(''); // empty = no error
-  protected readonly searchText = signal(''); // what the user typed
-  protected readonly selectedFaculty = signal('all'); // dropdown 1
-  protected readonly sortBy = signal<SortMode>('featured'); // dropdown 2
-
-  //DERIVED STATE with `computed`.
-  // The list of faculties for the dropdown comes from the data itself.
-  // If a new faculty appears in the JSON, the dropdown updates by itself.
-  protected readonly faculties = computed(() =>
-    [...new Set(this.students().map((s) => s.faculty))].sort(),
-  );
-
-  // The list the page actually shows = all students, minus the
-  // ones filtered out, in the chosen order.
-  // WHY computed and not a normal method? It only recalculates when one
-  // of the signals it reads changes, so it is efficient.
-  protected readonly visibleStudents = computed(() => {
-    const text = this.searchText().trim().toLowerCase();
-    const faculty = this.selectedFaculty();
-
-    //  Filter: keep a student only if BOTH conditions pass.
-    const filtered = this.students().filter(
-      (s) => s.name.toLowerCase().includes(text) && (faculty === 'all' || s.faculty === faculty),
-    );
-
-    //  Sort. COMMON MISTAKE: .sort() changes the array it is called on.
-    // Our `filtered` array is a fresh copy (filter made it), so it is safe.
-    return this.sortBy() === 'name'
-      ? filtered.sort((a, b) => a.name.localeCompare(b.name))
-      : filtered.sort((a, b) => Number(b.featured) - Number(a.featured) || a.id - b.id);
-  });
-
-  // "08" style counter used by the tab label in the design.
-  protected readonly totalLabel = computed(() => String(this.students().length).padStart(2, '0'));
+  // selectSignal turns a selector into a signal. The template still
+  // calls these with (), and they update when the store changes.
+  protected readonly students = this.store.selectSignal(selectAllStudents);
+  protected readonly loading = this.store.selectSignal(selectLoading);
+  protected readonly errorMessage = this.store.selectSignal(selectErrorMessage);
+  protected readonly searchText = this.store.selectSignal(selectSearchText);
+  protected readonly selectedFaculty = this.store.selectSignal(selectSelectedFaculty);
+  protected readonly sortBy = this.store.selectSignal(selectSortBy);
+  protected readonly faculties = this.store.selectSignal(selectFaculties);
+  protected readonly visibleStudents = this.store.selectSignal(selectVisibleStudents);
+  protected readonly totalLabel = this.store.selectSignal(selectTotalLabel);
 
   // ngOnInit runs ONCE, right after Angular creates the component.
-  // It is the standard place to start loading data.
+  // If the list was already loaded, the reducer and the effect do nothing.
   ngOnInit(): void {
-    // .subscribe() actually sends the request. We pass two handlers:
-    // `next` runs when data arrives, `error` runs if the request fails.
-    this.studentService.getStudents().subscribe({
-      next: (data) => {
-        this.students.set(data);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.errorMessage.set('We could not load the students. Please try again.');
-        this.loading.set(false);
-      },
-    });
+    this.store.dispatch(loadStudents());
   }
 
-  // Event handlers. Each reads what the user did and updates a signal.
-  // `event.target` is typed as the generic EventTarget, so we tell
-  // TypeScript which element it really is with `as`.
+  // Event handlers report what the user did. The reducer writes the state.
   protected onSearch(event: Event): void {
-    this.searchText.set((event.target as HTMLInputElement).value);
+    this.store.dispatch(setSearchText({ searchText: (event.target as HTMLInputElement).value }));
   }
 
   protected onFacultyChange(event: Event): void {
-    this.selectedFaculty.set((event.target as HTMLSelectElement).value);
+    this.store.dispatch(setFaculty({ faculty: (event.target as HTMLSelectElement).value }));
   }
 
   protected onSortChange(event: Event): void {
-    this.sortBy.set((event.target as HTMLSelectElement).value as SortMode);
+    this.store.dispatch(setSort({ sortBy: (event.target as HTMLSelectElement).value as SortMode }));
   }
 
   protected scrollToTop(): void {
