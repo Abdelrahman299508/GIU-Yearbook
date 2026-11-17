@@ -1,0 +1,38 @@
+<section class="profile-form">
+  <p class="overline">MY YEARBOOK</p>
+  <h1>My story</h1>
+
+  <form [formGroup]="form">
+    <label class="field" for="quote">
+      Quote
+      <input id="quote" type="text" formControlName="quote" />
+    </label>
+
+    <label class="field" for="story">
+      Story
+      <textarea id="story" rows="4" formControlName="story"></textarea>
+    </label>
+
+    <label class="field" for="moment">
+      A moment
+      <input id="moment" type="text" formControlName="moment" />
+    </label>
+
+    <label class="field" for="next">
+      What is next
+      <input id="next" type="text" formControlName="next" />
+    </label>
+
+    <label class="consent">
+      <input type="checkbox" formControlName="consent" />
+      I agree to publish this story in the yearbook.
+    </label>
+
+    <div class="actions">
+      <p class="actions__status">{{ statusText() }}</p>
+      <div class="actions__buttons">
+        <button type="button" class="btn" (click)="onSave()">Save draft</button>
+      </div>
+    </div>
+  </form>
+</section>

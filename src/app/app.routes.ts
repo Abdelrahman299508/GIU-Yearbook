@@ -6,6 +6,7 @@
    ===================================================================== */
 import { Routes } from '@angular/router';
 
+import { authGuard } from './guards/auth.guard';
 import { StudentsPage } from './pages/students-page/students-page';
 import { StudentProfilePage } from './pages/student-profile/student-profile';
 import { PlaceholderPage } from './pages/placeholder-page/placeholder-page';
@@ -25,6 +26,12 @@ export const routes: Routes = [
   // Pages we have NOT designed yet still use one placeholder page.
   { path: 'gallery', component: PlaceholderPage, data: { title: 'Gallery' } },
   { path: 'login', component: PlaceholderPage, data: { title: 'Student login' } },
+  {
+    path: 'profile',
+    title: 'My story · GIU Yearbook',
+    canActivate: [authGuard],
+    loadComponent: () => import('./pages/profile-page/profile-page').then((m) => m.ProfilePage),
+  },
 
   // STEP 3: `:id` is a route PARAMETER. /students/3 and /students/7 both
   // match this route. The profile reads that number and asks the store
